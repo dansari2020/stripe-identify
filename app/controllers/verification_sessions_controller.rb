@@ -1,6 +1,6 @@
 class VerificationSessionsController < ApplicationController
   skip_before_action :verify_authenticity_token
-  
+
   def create
     verification_session = Stripe::Identity::VerificationSession.create(
       {
