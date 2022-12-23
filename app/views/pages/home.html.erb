@@ -1,4 +1,38 @@
 <div class="container mx-auto pt-5">
-  <h1 class="text-5x1">Pages#home</h1>
-  <p>Find me in app/views/pages/home.html.erb</p>
+  <button id="verify-button">Verify</button>
+
+  <script type="text/javascript">
+    // Set your publishable key: remember to change this to your live publishable key in production
+    // See your keys here: https://dashboard.stripe.com/apikeys
+    var stripe = Stripe('pk_test_51FOhyhCiQSLSNSsfgWfPOiCJFNKyLEyr3baF5H4hBcpm4fUxMDvu10CXH8io69YXTd1paB1u1JRUlGWDgmGlirub00zSV340A9')
+
+    var verifyButton = document.getElementById('verify-button');
+
+    verifyButton.addEventListener('click', function() {
+      // Get the VerificationSession client secret using the server-side
+      // endpoint you created in step 3.
+      fetch('<%= create_verification_session_url %>', {
+        method: 'POST',
+      })
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(session) {
+          // Show the verification modal.
+          return stripe.verifyIdentity(session.client_secret);
+        })
+        .then(function(result) {
+          // If `verifyIdentity` fails, you should display the error message
+          // using `error.message`.
+          if (result.error) {
+            alert(result.error.message);
+          } else {
+            window.location.href = '<%= submitted_url %>';
+          }
+        })
+        .catch(function(error) {
+          console.error('Error:', error);
+        });
+    });
+  </script>
 </div>
