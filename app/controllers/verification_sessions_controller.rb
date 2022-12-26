@@ -6,10 +6,57 @@ class VerificationSessionsController < ApplicationController
       {
         type: 'document',
         metadata: {
-          user_id: '{{USER_ID}}',
+          property_uid: 'secr',
+        },
+        options: {
+          document: {
+            allowed_types: %w[driving_license passport id_card],
+            require_live_capture: true,
+            require_matching_selfie: true
+          }
         },
       })
 
     render json: { client_secret: verification_session.client_secret }
+  end
+
+  def webhook
+    event = nil
+
+    # Verify webhook signature and extract the event
+    # See https://stripe.com/docs/webhooks/signatures for more information.
+    begin
+      sig_header = request.env['HTTP_STRIPE_SIGNATURE']
+      payload = request.body.read
+      event = Stripe::Webhook.construct_event(payload, sig_header, Stripe.api_key)
+      puts event.inspect
+
+      my_logger = Logger.new("#{Rails.root}/logs/stripe.log")
+      my_logger.info(event.inspect)
+    rescue JSON::ParserError => e
+      # Invalid payload
+      puts e.inspect
+      my_logger = Logger.new("#{Rails.root}/logs/stripe.log")
+      my_logger.error(e.inspect)
+      return status 400
+    rescue Stripe::SignatureVerificationError => e
+      # Invalid signature
+      puts e.inspect
+      my_logger = Logger.new("#{Rails.root}/logs/stripe.log")
+      my_logger.error(e.inspect)
+      return status 400
+    end
+
+    status 200
+  end
+
+  def show
+    data = Stripe::Identity::VerificationSession.retrieve(
+      id: params[:id],
+      expand: [
+        'verified_outputs',
+        'last_verification_report'
+      ])
+    render json: { data: data }
   end
 end

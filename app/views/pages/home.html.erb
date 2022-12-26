@@ -27,7 +27,7 @@
           if (result.error) {
             alert(result.error.message);
           } else {
-            window.location.href = '<%= submitted_url %>';
+            console.log('result', result)
           }
         })
         .catch(function(error) {
