@@ -65,7 +65,11 @@ class VerificationSessionsController < ApplicationController
         'verified_outputs.dob',
         'verified_outputs.id_number',
         'last_verification_report',
+        'last_verification_report.document.expiration_date',
+        'last_verification_report.document.dob',
         'last_verification_report.document.number',
+        'last_verification_report.id_number.dob',
+        'last_verification_report.id_number.id_number',
       ])
   end
 
