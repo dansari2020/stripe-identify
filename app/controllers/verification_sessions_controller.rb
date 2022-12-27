@@ -64,9 +64,8 @@ class VerificationSessionsController < ApplicationController
         'verified_outputs',
         'verified_outputs.dob',
         'verified_outputs.id_number',
-        'id_number.dob',
-        'id_number.id_number',
         'last_verification_report',
+        'last_verification_report.document.number',
       ])
   end
 
