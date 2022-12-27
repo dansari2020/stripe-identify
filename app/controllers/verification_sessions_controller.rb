@@ -64,8 +64,16 @@ class VerificationSessionsController < ApplicationController
         'verified_outputs',
         'verified_outputs.dob',
         'verified_outputs.id_number',
-        'last_verification_report'
+        'id_number.dob',
+        'id_number.id_number',
+        'last_verification_report',
       ])
+  end
+
+  def verification_report
+    @data = Stripe::Identity::VerificationReport.retrieve(
+      params[:id],
+      )
   end
 
   def search
