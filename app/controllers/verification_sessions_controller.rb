@@ -1,6 +1,9 @@
 class VerificationSessionsController < ApplicationController
   skip_before_action :verify_authenticity_token
 
+  def index
+  end
+
   def create
     verification_session = Stripe::Identity::VerificationSession.create(
       {
@@ -51,12 +54,15 @@ class VerificationSessionsController < ApplicationController
   end
 
   def show
-    data = Stripe::Identity::VerificationSession.retrieve(
+    @data = Stripe::Identity::VerificationSession.retrieve(
       id: params[:id],
       expand: [
         'verified_outputs',
         'last_verification_report'
       ])
-    render json: { data: data }
+  end
+
+  def search
+    redirect_to retrieve_verification_path(params[:verification_session_id])
   end
 end

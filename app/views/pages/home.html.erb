@@ -1,38 +1,53 @@
 <div class="container mx-auto pt-5 text-center">
-  <button id="verify-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">Verify</button>
+  <ul>
+    <li>
+      <p class="mb-4">
+        <a id="verify-button"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
+        >Verify
+        </a>
+      </p>
+    </li>
+    <li>
+      <p class="mb-4">
+        <%= link_to "Retrieve Verification Session", verifications_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded" %>
+      </p>
+    </li>
+    <li>
+      <p class="mb-4">
+        <%= link_to "Events", events_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded" %>
+      </p>
+    </li>
+  </ul>
 
   <script type="text/javascript">
-    // Set your publishable key: remember to change this to your live publishable key in production
-    // See your keys here: https://dashboard.stripe.com/apikeys
-    var stripe = Stripe('pk_test_51FOhyhCiQSLSNSsfgWfPOiCJFNKyLEyr3baF5H4hBcpm4fUxMDvu10CXH8io69YXTd1paB1u1JRUlGWDgmGlirub00zSV340A9')
+    let stripe = Stripe('<%= ENV["STRIP_PUBLIC_KEY"] %>')
 
-    var verifyButton = document.getElementById('verify-button');
+    let verifyButton = document.getElementById('verify-button');
 
-    verifyButton.addEventListener('click', function() {
-      // Get the VerificationSession client secret using the server-side
-      // endpoint you created in step 3.
+    verifyButton.addEventListener('click', function () {
       fetch('<%= create_verification_session_url %>', {
         method: 'POST',
       })
-        .then(function(response) {
+        .then(function (response) {
+          console.log('response.json()',response.json())
           return response.json();
         })
-        .then(function(session) {
-          // Show the verification modal.
+        .then(function (session) {
+          console.log('stripe.verifyIdentity(session.client_secret)',stripe.verifyIdentity(session.client_secret))
           return stripe.verifyIdentity(session.client_secret);
         })
-        .then(function(result) {
-          // If `verifyIdentity` fails, you should display the error message
-          // using `error.message`.
+        .then(function (result) {
           if (result.error) {
             alert(result.error.message);
           } else {
-            window.location.href = "https://emenu.okkami.com/pre-checkin/000-000-0057d/home";
+            console.log('success', result)
+            // window.location.href = "https://emenu.okkami.com/pre-checkin/000-000-0057d/home";
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.error('Error:', error);
         });
-    });
+    })
   </script>
 </div>
