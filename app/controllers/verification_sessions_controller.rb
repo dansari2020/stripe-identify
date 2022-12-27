@@ -62,6 +62,8 @@ class VerificationSessionsController < ApplicationController
       id: params[:id],
       expand: [
         'verified_outputs',
+        'verified_outputs.address',
+        'verified_outputs.dob',
         'last_verification_report'
       ])
   end
