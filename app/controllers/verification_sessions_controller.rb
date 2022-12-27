@@ -72,7 +72,7 @@ class VerificationSessionsController < ApplicationController
 
   def verification_report
     @data = Stripe::Identity::VerificationReport.retrieve(
-      params[:id],
+      id: params[:id],
       expand: [
         'id_number.dob',
         'id_number.id_number',
