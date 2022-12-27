@@ -35,5 +35,5 @@
 
 /node_modules
 .idea/
-.byebug_historyga
+.byebug_history
 .env

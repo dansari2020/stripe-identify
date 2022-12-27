@@ -31,26 +31,30 @@ class VerificationSessionsController < ApplicationController
     begin
       sig_header = request.env['HTTP_STRIPE_SIGNATURE']
       payload = request.body.read
+      return head :ok if payload.empty?
+
+      Event.create(body: payload)
+
       event = Stripe::Webhook.construct_event(payload, sig_header, Stripe.api_key)
       puts event.inspect
 
-      my_logger = Logger.new("#{Rails.root}/logs/stripe.log")
+      my_logger = Logger.new("#{Rails.root}/log/stripe.log")
       my_logger.info(event.inspect)
     rescue JSON::ParserError => e
       # Invalid payload
       puts e.inspect
-      my_logger = Logger.new("#{Rails.root}/logs/stripe.log")
+      my_logger = Logger.new("#{Rails.root}/log/stripe.log")
       my_logger.error(e.inspect)
-      return status 400
+      return head :bad_request
     rescue Stripe::SignatureVerificationError => e
       # Invalid signature
       puts e.inspect
-      my_logger = Logger.new("#{Rails.root}/logs/stripe.log")
+      my_logger = Logger.new("#{Rails.root}/log/stripe.log")
       my_logger.error(e.inspect)
-      return status 400
+      return head :bad_request
     end
 
-    status 200
+    head :ok
   end
 
   def show
