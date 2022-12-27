@@ -2,52 +2,56 @@
   <ul>
     <li>
       <p class="mb-4">
-        <a id="verify-button"
+        <button id="verify-button"
                 class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
         >Verify
-        </a>
+        </button>
       </p>
     </li>
     <li>
-      <p class="mb-4">
+      <p class="mb-6">
         <%= link_to "Retrieve Verification Session", verifications_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded" %>
       </p>
     </li>
     <li>
-      <p class="mb-4">
+      <p class="mb-6">
         <%= link_to "Events", events_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded" %>
       </p>
     </li>
   </ul>
 
   <script type="text/javascript">
-    let stripe = Stripe('<%= ENV["STRIP_PUBLIC_KEY"] %>')
+    // Set your publishable key: remember to change this to your live publishable key in production
+    // See your keys here: https://dashboard.stripe.com/apikeys
+    var stripe = Stripe('<%= ENV['STRIPE_PUBLIC_KEY'] %>')
 
-    let verifyButton = document.getElementById('verify-button');
+    var verifyButton = document.getElementById('verify-button');
 
-    verifyButton.addEventListener('click', function () {
+    verifyButton.addEventListener('click', function() {
+      // Get the VerificationSession client secret using the server-side
+      // endpoint you created in step 3.
       fetch('<%= create_verification_session_url %>', {
         method: 'POST',
       })
-        .then(function (response) {
-          console.log('response.json()',response.json())
+        .then(function(response) {
           return response.json();
         })
-        .then(function (session) {
-          console.log('stripe.verifyIdentity(session.client_secret)',stripe.verifyIdentity(session.client_secret))
+        .then(function(session) {
+          // Show the verification modal.
           return stripe.verifyIdentity(session.client_secret);
         })
-        .then(function (result) {
+        .then(function(result) {
+          // If `verifyIdentity` fails, you should display the error message
+          // using `error.message`.
           if (result.error) {
             alert(result.error.message);
           } else {
-            console.log('success', result)
-            // window.location.href = "https://emenu.okkami.com/pre-checkin/000-000-0057d/home";
+            console.log('result', result)
           }
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.error('Error:', error);
         });
-    })
+    });
   </script>
 </div>
